@@ -25,7 +25,7 @@ import org.kelvintam.composenewsreader.ui.screen.destinations.MainScreenDestinat
 import org.kelvintam.composenewsreader.ui.theme.ComposeNewsReaderTheme
 
 class MainActivity : ComponentActivity() {
-
+    val viewModel = CNRViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     DestinationsNavHost(navGraph = NavGraphs.root){
                         composable(MainScreenDestination) {
-                            MainScreen(CNRViewModel())
+                            MainScreen(viewModel, destinationsNavigator)
                         }
                     }
                 }
