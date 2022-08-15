@@ -14,12 +14,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.*
 import org.kelvintam.composenewsreader.CNRViewModel
 import org.kelvintam.composenewsreader.datamodel.RetrofitHelper
 
 const val TAG = "MainScreen"
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun MainScreen(viewModel: CNRViewModel) {
     Column(

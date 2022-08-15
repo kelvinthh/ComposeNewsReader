@@ -16,8 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import org.kelvintam.composenewsreader.datamodel.NewsModel
 import org.kelvintam.composenewsreader.ui.screen.MainScreen
+import org.kelvintam.composenewsreader.ui.screen.NavGraphs
+import org.kelvintam.composenewsreader.ui.screen.destinations.MainScreenDestination
 import org.kelvintam.composenewsreader.ui.theme.ComposeNewsReaderTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +35,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainScreen(CNRViewModel())
+                    DestinationsNavHost(navGraph = NavGraphs.root){
+                        composable(MainScreenDestination) {
+                            MainScreen(CNRViewModel())
+                        }
+                    }
                 }
             }
         }
