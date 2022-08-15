@@ -1,6 +1,7 @@
 package org.kelvintam.composenewsreader.datamodel
 
 import android.util.Log
+import org.intellij.lang.annotations.Language
 import org.kelvintam.composenewsreader.BuildConfig
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
@@ -9,6 +10,7 @@ import retrofit2.http.Query
 
 const val API_URL = "https://newsapi.org/v2/"
 const val API_KEYS = BuildConfig.NEWS_API_KEY
+const val LANG = "en"
 
 const val TAG = "Retrofit Helper"
 
@@ -18,7 +20,8 @@ interface ApiService {
         @Query("q") q: String?,
         @Query("from") from: String?,
         @Query("sortBy") sortBy: String?,
-        @Query("apiKey") apiKey: String = API_KEYS
+        @Query("apiKey") apiKey: String = API_KEYS,
+        @Query("language") language: String = LANG
     ): Response<NewsModel>
 
     @GET("top-headlines")
