@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
 class CNRViewModel : ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val headlines = RetrofitHelper.getHeadLinesCall("us", null)
+            val headlines = RetrofitHelper.getHeadLinesCall("us")
             if (headlines != null) {
                 headlineList = headlines
             }

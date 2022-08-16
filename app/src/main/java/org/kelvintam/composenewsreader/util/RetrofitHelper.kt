@@ -17,18 +17,27 @@ const val TAG = "Retrofit Helper"
 interface ApiService {
     @GET("everything")
     suspend fun getNewsFromTopic(
-        @Query("q") q: String?,
-        @Query("from") from: String?,
-        @Query("sortBy") sortBy: String?,
         @Query("apiKey") apiKey: String = API_KEYS,
-        @Query("language") language: String = LANG
+        @Query("q") q: String? = null,
+        @Query("searchIn") searchIn: String? = null,
+        @Query("sources") sources: String? = null,
+        @Query("domains") domains: String? = null,
+        @Query("excludeDomains") excludeDomains: String? = null,
+        @Query("from") from: String? = null,
+        @Query("to") to: String? = null,
+        @Query("language") language: String = LANG,
+        @Query("sortBy") sortBy: String? = "publishedAt",
+        @Query("pageSize") pageSize: Int? = 100,
+        @Query("page") page: Int? = 1,
     ): Response<NewsModel>
 
     @GET("top-headlines")
     suspend fun getHeadlines(
-        @Query("country") country: String?,
-        @Query("source") source: String?,
-        @Query("apiKey") apiKey: String = API_KEYS
+        @Query("apiKey") apiKey: String = API_KEYS,
+        @Query("country") country: String? = null,
+        @Query("category") category: String? = null,
+        @Query("sources") sources: String? = null,
+        @Query("q") q: String? = null,
     ): Response<NewsModel>
 }
 
@@ -54,16 +63,17 @@ object RetrofitHelper {
         }
         return null
     }
+
     // ================= Public functions // =================
     suspend fun getNewsFromTopicCall(
         q: String?,
         from: String?,
         sortBy: String?
     ): List<NewsModel.Article>? {
-        return getResult(api.getNewsFromTopic(q, from, sortBy))
+        return getResult(api.getNewsFromTopic(q = q, from = from, sortBy = sortBy))
     }
 
-    suspend fun getHeadLinesCall(country: String?, source: String?): List<NewsModel.Article>? {
-        return getResult(api.getHeadlines(country, source))
+    suspend fun getHeadLinesCall(country: String?): List<NewsModel.Article>? {
+        return getResult(api.getHeadlines(country = country))
     }
 }
