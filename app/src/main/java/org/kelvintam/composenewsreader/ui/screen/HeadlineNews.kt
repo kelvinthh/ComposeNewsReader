@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import org.kelvintam.composenewsreader.CNRViewModel
+import org.kelvintam.composenewsreader.datamodel.CNRViewModel
 import org.kelvintam.composenewsreader.ui.component.NewsCard
 
 @Destination

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -29,7 +30,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.*
-import org.kelvintam.composenewsreader.CNRViewModel
+import org.kelvintam.composenewsreader.datamodel.CNRViewModel
 import org.kelvintam.composenewsreader.datamodel.NewsModel
 import org.kelvintam.composenewsreader.datamodel.RetrofitHelper
 import org.kelvintam.composenewsreader.datamodel.Tabs
@@ -77,7 +78,7 @@ fun MainScreen(viewModel: CNRViewModel, navigator: DestinationsNavigator) {
             Tabs.HEADLINES -> HeadlineNews(navigator, viewModel)
             Tabs.ALL_NEWS -> NewsList(navigator, viewModel)
             Tabs.RECENT_READ -> RecentRead(navigator, viewModel)
-            else -> {
+            /*else -> {
                 Column(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,9 +86,13 @@ fun MainScreen(viewModel: CNRViewModel, navigator: DestinationsNavigator) {
                 ) {
                     Text(tabs[page].title)
                 }
-            }
+            }*/
         }
 
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.currentTab = tabs[pagerState.currentPage]
     }
 
 }
