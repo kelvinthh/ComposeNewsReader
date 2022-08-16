@@ -15,12 +15,17 @@ import org.kelvintam.composenewsreader.datamodel.NewsModel
 import org.kelvintam.composenewsreader.ui.screen.destinations.NewsDetailDestination
 
 @Composable
-fun NewsCard(navigator: DestinationsNavigator, article: NewsModel.Article) {
+fun NewsCard(
+    navigator: DestinationsNavigator,
+    article: NewsModel.Article,
+    writeRecentReadListToPref: (NewsModel.Article) -> Unit,
+) {
     Column(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 15.dp, vertical = 5.dp)
             .clickable {
+                writeRecentReadListToPref(article)
                 navigator.navigate(NewsDetailDestination(article))
             }
     ) {

@@ -76,6 +76,7 @@ fun MainScreen(viewModel: CNRViewModel, navigator: DestinationsNavigator) {
         when (tabs[page]) {
             Tabs.HEADLINES -> HeadlineNews(navigator, viewModel)
             Tabs.ALL_NEWS -> NewsList(navigator, viewModel)
+            Tabs.RECENT_READ -> RecentRead(navigator, viewModel)
             else -> {
                 Column(
                     Modifier.fillMaxSize(),

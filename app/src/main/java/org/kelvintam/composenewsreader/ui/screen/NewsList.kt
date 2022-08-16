@@ -60,8 +60,8 @@ fun NewsList(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
         }
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(items = viewModel.newsList, key = { it.url }) {
-                NewsCard(navigator, it)
+            items(items = viewModel.newsList, key = { it.url }) { article ->
+                NewsCard(navigator, article) { viewModel.writeRecentReadListToPref(it) }
             }
         }
     }
