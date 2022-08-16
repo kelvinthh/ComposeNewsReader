@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -78,13 +82,21 @@ fun MainScreen(viewModel: CNRViewModel, navigator: DestinationsNavigator) {
                             navigator.navigate(NewsDetailDestination(it))
                         }) {
                     Text(it.title)
-                    Text(it.description)
-                    Text(it.publishedAt)
-                    Text("${it.author}, ${it.source.name}")
+                    it.description?.let { description ->
+                        Text(
+                            description,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                     Spacer(modifier = Modifier.height(5.dp))
-                    Text(it.content)
+                    Text("${it.source.name} ${it.publishedAt}")
                     Spacer(modifier = Modifier.height(5.dp))
-                    Divider(modifier = Modifier.fillMaxWidth(), color = Color.Gray)
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.Gray,
+                        thickness = 2.dp
+                    )
                 }
             }
         }
@@ -106,10 +118,18 @@ fun NewsDetail(
             Text("Return")
         }
         Text(article.title)
-        Text(article.description)
+        article.description?.let { Text(it) }
         Text(article.publishedAt)
         Text("${article.author}, ${article.source.name}")
-        Spacer(modifier = Modifier.height(5.dp))
+        SubcomposeAsyncImage(
+            model = article.urlToImage,
+            loading = {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            },
+            contentDescription = article.description
+        )
         Text(article.content)
         Button(
             onClick = { uriHandler.openUri(article.url) },

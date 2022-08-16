@@ -81,8 +81,12 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
 
+    // Compose Destination
     implementation "io.github.raamcosta.compose-destinations:core:1.6.15-beta"
     ksp "io.github.raamcosta.compose-destinations:ksp:1.6.15-beta"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:2.1.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
