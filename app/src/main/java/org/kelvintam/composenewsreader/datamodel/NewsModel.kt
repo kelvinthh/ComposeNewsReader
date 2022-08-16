@@ -11,8 +11,8 @@ data class NewsModel(
 ) : Parcelable {
     @Parcelize
     data class Article(
-        val author: String,
-        val content: String,
+        val author: String?,
+        val content: String?,
         val description: String?,
         val publishedAt: String,
         val source: Source,
