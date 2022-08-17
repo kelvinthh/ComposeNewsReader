@@ -3,6 +3,7 @@ package org.kelvintam.composenewsreader.datamodel
 import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,16 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CNRViewModel(
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) : ViewModel() {
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            readRecentReadListFromPref()
-            val headlines = RetrofitHelper.getHeadLinesCall("us")
-            if (headlines != null) {
-                headlineList = headlines
-            }
-        }
+        refreshHeadlines()
     }
 
     private val editor: SharedPreferences.Editor = sharedPreferences.edit()
@@ -33,6 +28,11 @@ class CNRViewModel(
     val recentReadList = mutableListOf<NewsModel.Article>()
     var newsList by mutableStateOf(emptyList<NewsModel.Article>())
     var headlineList by mutableStateOf(emptyList<NewsModel.Article>())
+    val isHeadLinesRefreshing by mutableStateOf(false)
+
+    //////////////// News search setting ////////////////
+    var sortBy by mutableStateOf(SortBy.PUBLISHED_AT)
+    /////////////////////////////////////x////////////////
 
     fun writeRecentReadListToPref(article: NewsModel.Article) {
         if (recentReadList.contains(article)) return
@@ -49,6 +49,16 @@ class CNRViewModel(
             val type = object : TypeToken<List<NewsModel.Article>>() {}.type
             articleList = Gson().fromJson(serializedObject, type)
             recentReadList.addAll(articleList)
+        }
+    }
+
+    fun refreshHeadlines(){
+        viewModelScope.launch(Dispatchers.IO) {
+            readRecentReadListFromPref()
+            val headlines = RetrofitHelper.getHeadLinesCall("us")
+            if (headlines != null) {
+                headlineList = headlines
+            }
         }
     }
 }
