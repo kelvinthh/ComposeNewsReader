@@ -18,7 +18,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.*
 import org.kelvintam.composenewsreader.datamodel.CNRViewModel
 import org.kelvintam.composenewsreader.datamodel.Tabs
-import kotlin.reflect.KFunction1
 
 @RootNavGraph(start = true)
 @Destination
@@ -64,7 +63,7 @@ fun MainScreen(
         Log.d(TAG, "Main Screen")
         when (tabs[page]) {
             Tabs.HEADLINES -> HeadlineNews(navigator, viewModel)
-            Tabs.ALL_NEWS -> NewsList(navigator, viewModel)
+            Tabs.NEWS_SEARCH -> NewsSearch(navigator, viewModel)
             Tabs.RECENT_READ -> RecentRead(navigator, viewModel)
         }
 

@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 
 package org.kelvintam.composenewsreader.ui.screen
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,11 +16,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
@@ -30,13 +32,15 @@ import org.kelvintam.composenewsreader.ui.component.NewsCard
 import org.kelvintam.composenewsreader.R
 import org.kelvintam.composenewsreader.datamodel.RetrofitHelper
 import org.kelvintam.composenewsreader.datamodel.SortBy
+import org.kelvintam.composenewsreader.ui.theme.StickyHeaderBg
+import org.kelvintam.composenewsreader.ui.theme.StickyHeaderText
 import org.kelvintam.composenewsreader.ui.theme.TextStyle
 
 @Destination
 @Composable
-fun NewsList(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
+fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
 
-    val TAG = "News List"
+    val TAG = "NewsSearch"
 
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
@@ -51,7 +55,7 @@ fun NewsList(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Log.d(TAG, "Main Screen")
+            Log.d(TAG, "News Search")
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -107,6 +111,23 @@ fun NewsList(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
             }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
+                stickyHeader {
+                    Box(
+                        modifier = Modifier
+                            .background(StickyHeaderBg)
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(36.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = "Found ${viewModel.newsList.size} result(s)",
+                            fontWeight = FontWeight.W500,
+                            fontSize = 16.sp,
+                            color = StickyHeaderText
+                        )
+                    }
+                }
                 items(items = viewModel.newsList, key = { it.url }) { article ->
                     NewsCard(navigator, article) { viewModel.writeRecentReadListToPref(it) }
                 }

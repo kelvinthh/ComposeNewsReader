@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +17,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.kelvintam.composenewsreader.datamodel.CNRViewModel
 import org.kelvintam.composenewsreader.ui.component.NewsCard
+import org.kelvintam.composenewsreader.ui.theme.TextStyle
 
 @Destination
 @Composable
@@ -53,6 +55,9 @@ fun HeadlineNews(
                     }
                 }
                 return@LazyColumn
+            }
+            item{
+                Text("Welcome!", style = TextStyle.welcome, modifier = Modifier.padding(horizontal = 15.dp))
             }
             items(items = viewModel.headlineList, key = { it.url }) { article ->
                 NewsCard(navigator, article) { viewModel.writeRecentReadListToPref(it) }

@@ -2,6 +2,6 @@ package org.kelvintam.composenewsreader.datamodel
 
 enum class Tabs (val title: String){
     HEADLINES("Headlines"),
-    ALL_NEWS("All News"),
+    NEWS_SEARCH("Search"),
     RECENT_READ("Recent Read")
 }

@@ -5,6 +5,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 object TextStyle {
+    val welcome = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp
+    )
     val header = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp
