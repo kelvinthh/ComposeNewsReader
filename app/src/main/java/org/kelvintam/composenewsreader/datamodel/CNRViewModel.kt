@@ -1,10 +1,7 @@
 package org.kelvintam.composenewsreader.datamodel
 
 import android.content.SharedPreferences
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -25,7 +22,7 @@ class CNRViewModel(
 
     var searchBoxText by mutableStateOf("")
 
-    val recentReadList = mutableListOf<NewsModel.Article>()
+    val recentReadList = mutableStateListOf<NewsModel.Article>()
     var newsList by mutableStateOf(emptyList<NewsModel.Article>())
     var headlineList by mutableStateOf(emptyList<NewsModel.Article>())
     val isHeadLinesRefreshing by mutableStateOf(false)
@@ -34,9 +31,11 @@ class CNRViewModel(
     var sortBy by mutableStateOf(SortBy.PUBLISHED_AT)
     /////////////////////////////////////x////////////////
 
-    fun writeRecentReadListToPref(article: NewsModel.Article) {
-        if (recentReadList.contains(article)) return
-        recentReadList.add(0, article)
+    fun writeRecentReadListToPref(article: NewsModel.Article? = null) {
+        if(article != null){
+            if (recentReadList.contains(article)) return
+            recentReadList.add(0, article)
+        }
         val json = Gson().toJson(recentReadList)
         editor.putString("recentReadList", json)
         editor.commit()

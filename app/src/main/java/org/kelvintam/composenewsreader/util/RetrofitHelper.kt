@@ -78,7 +78,7 @@ object RetrofitHelper {
 }
 
 enum class SortBy(val value: String, val title: String) {
-    PUBLISHED_AT("publishedAt", "Published At"),
+    PUBLISHED_AT("publishedAt", "Newest"),
     POPULARITY("popularity", "Popularity"),
     RELEVANCY("relevancy", "Relevancy")
 }

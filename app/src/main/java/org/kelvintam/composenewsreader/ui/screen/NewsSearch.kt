@@ -16,7 +16,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +37,7 @@ import org.kelvintam.composenewsreader.datamodel.SortBy
 import org.kelvintam.composenewsreader.ui.theme.StickyHeaderBg
 import org.kelvintam.composenewsreader.ui.theme.StickyHeaderText
 import org.kelvintam.composenewsreader.ui.theme.TextStyle
+import java.net.URLEncoder
 
 @Destination
 @Composable
@@ -44,11 +47,13 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
 
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetContent = { SheetBody(viewModel) }
+        sheetContent = { SheetBody(viewModel, modalBottomSheetState, coroutineScope) }
 
     ) {
         Column(
@@ -88,7 +93,7 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                                     contentDescription = "Clear Search",
                                     Modifier.clickable { viewModel.searchBoxText = "" }
                                 )
-                                TextButton(onClick = { search(viewModel) }) {
+                                TextButton(onClick = { search(viewModel, focusManager) }) {
                                     Text(text = "Search")
                                 }
                             }
@@ -96,11 +101,17 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(
-                        onSearch = { search(viewModel) }
+                        onSearch = { search(viewModel, focusManager) }
                     ),
                 )
+
                 IconButton(
-                    onClick = { coroutineScope.launch { modalBottomSheetState.show() } },
+                    onClick = {
+                        focusManager.clearFocus()
+                        coroutineScope.launch {
+                            modalBottomSheetState.show()
+                        }
+                    },
                     modifier = Modifier.weight(0.75f)
                 ) {
                     Icon(
@@ -137,7 +148,11 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
 }
 
 @Composable
-fun ColumnScope.SheetBody(viewModel: CNRViewModel) {
+fun ColumnScope.SheetBody(
+    viewModel: CNRViewModel,
+    state: ModalBottomSheetState,
+    coroutineScope: CoroutineScope
+) {
     Divider(
         color = Color(0xFFDCDCDC),
         thickness = 4.dp,
@@ -173,15 +188,24 @@ fun ColumnScope.SheetBody(viewModel: CNRViewModel) {
             }
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { coroutineScope.launch { state.hide() } }) {
+            Text("Close")
+        }
+
     }
 }
 
-fun search(viewModel: CNRViewModel) {
+fun search(viewModel: CNRViewModel, focusManager: FocusManager) {
+    focusManager.clearFocus()
     val encodedString =
-        java.net.URLEncoder.encode(viewModel.searchBoxText, "utf-8")
+        URLEncoder.encode(viewModel.searchBoxText, "utf-8")
     CoroutineScope(Dispatchers.IO).launch {
         val result =
-            RetrofitHelper.getNewsFromTopicCall(encodedString)
+            RetrofitHelper.getNewsFromTopicCall(encodedString, viewModel.sortBy)
         if (result != null) {
             viewModel.newsList = result
         }
