@@ -67,9 +67,11 @@ object RetrofitHelper {
     // ================= Public functions // =================
     suspend fun getNewsFromTopicCall(
         q: String?,
-        sortBy: SortBy = SortBy.PUBLISHED_AT
+        sortBy: SortBy = SortBy.PUBLISHED_AT,
+        from: String?,
+        to: String?
     ): List<NewsModel.Article>? {
-        return getResult(api.getNewsFromTopic(q = q, sortBy = sortBy.value))
+        return getResult(api.getNewsFromTopic(q = q, sortBy = sortBy.value, from = from, to = to))
     }
 
     suspend fun getHeadLinesCall(country: String?): List<NewsModel.Article>? {

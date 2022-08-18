@@ -2,7 +2,10 @@
 
 package org.kelvintam.composenewsreader.ui.screen
 
+import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.util.Log
+import android.widget.DatePicker
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,16 +33,19 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.kelvintam.composenewsreader.datamodel.CNRViewModel
-import org.kelvintam.composenewsreader.ui.component.NewsCard
 import org.kelvintam.composenewsreader.R
+import org.kelvintam.composenewsreader.datamodel.CNRViewModel
 import org.kelvintam.composenewsreader.datamodel.RetrofitHelper
 import org.kelvintam.composenewsreader.datamodel.SortBy
+import org.kelvintam.composenewsreader.ui.component.NewsCard
 import org.kelvintam.composenewsreader.ui.theme.StickyHeaderBg
 import org.kelvintam.composenewsreader.ui.theme.StickyHeaderText
 import org.kelvintam.composenewsreader.ui.theme.TextStyle
 import java.net.URLEncoder
+import java.text.SimpleDateFormat
+import java.util.*
 
+@SuppressLint("SimpleDateFormat")
 @Destination
 @Composable
 fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
@@ -49,11 +56,25 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
+    val today = Date()
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
+    val fromDate = remember { mutableStateOf(today) }
+    val toDate = remember { mutableStateOf(today) }
+
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetContent = { SheetBody(viewModel, modalBottomSheetState, coroutineScope) }
+        sheetContent = {
+            SheetBody(
+                viewModel,
+                modalBottomSheetState,
+                coroutineScope,
+                fromDate,
+                toDate,
+                dateFormatter
+            )
+        }
 
     ) {
         Column(
@@ -93,7 +114,14 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                                     contentDescription = "Clear Search",
                                     Modifier.clickable { viewModel.searchBoxText = "" }
                                 )
-                                TextButton(onClick = { search(viewModel, focusManager) }) {
+                                TextButton(onClick = {
+                                    search(
+                                        viewModel,
+                                        focusManager,
+                                        dateFormatter.format(fromDate.value),
+                                        dateFormatter.format(toDate.value)
+                                    )
+                                }) {
                                     Text(text = "Search")
                                 }
                             }
@@ -101,7 +129,14 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(
-                        onSearch = { search(viewModel, focusManager) }
+                        onSearch = {
+                            search(
+                                viewModel,
+                                focusManager,
+                                dateFormatter.format(fromDate.value),
+                                dateFormatter.format(toDate.value)
+                            )
+                        }
                     ),
                 )
 
@@ -109,7 +144,7 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                     onClick = {
                         focusManager.clearFocus()
                         coroutineScope.launch {
-                            modalBottomSheetState.show()
+                            modalBottomSheetState.animateTo(ModalBottomSheetValue.Expanded)
                         }
                     },
                     modifier = Modifier.weight(0.75f)
@@ -151,7 +186,10 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
 fun ColumnScope.SheetBody(
     viewModel: CNRViewModel,
     state: ModalBottomSheetState,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    startDate: MutableState<Date>,
+    endDate: MutableState<Date>,
+    dateFormatter: SimpleDateFormat
 ) {
     Divider(
         color = Color(0xFFDCDCDC),
@@ -188,6 +226,22 @@ fun ColumnScope.SheetBody(
             }
         }
 
+        Spacer(Modifier.height(10.dp))
+
+        Text("Date", style = TextStyle.subHeader)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(Modifier.weight(1f)) {
+                Text("From")
+                PickDate(startDate, dateFormatter)
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("To")
+                PickDate(endDate, dateFormatter)
+
+            }
+        }
+
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
@@ -195,17 +249,58 @@ fun ColumnScope.SheetBody(
             onClick = { coroutineScope.launch { state.hide() } }) {
             Text("Close")
         }
-
     }
 }
 
-fun search(viewModel: CNRViewModel, focusManager: FocusManager) {
+
+// https://www.geeksforgeeks.org/date-picker-in-android-using-jetpack-compose/
+@Composable
+fun PickDate(date: MutableState<Date>, dateFormatter: SimpleDateFormat) {
+    // Fetching the Local Context
+    val mContext = LocalContext.current
+
+    // Declaring integer values
+    // for year, month and day
+    val mYear: Int
+    val mMonth: Int
+    val mDay: Int
+
+    // Initializing a Calendar
+    val mCalendar = Calendar.getInstance()
+
+    // Fetching current year, month and day
+    mYear = mCalendar.get(Calendar.YEAR)
+    mMonth = mCalendar.get(Calendar.MONTH)
+    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+    mCalendar.time = Date()
+
+    // Declaring a string value to
+    // store date in string format
+    val mDate = ""
+
+    // Declaring DatePickerDialog and setting
+    // initial values as current values (present year, month and day)
+    val mDatePickerDialog = DatePickerDialog(
+        mContext,
+        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+            date.value = dateFormatter.parse("$mYear-${mMonth + 1}-$mDayOfMonth") as Date
+        }, mYear, mMonth, mDay
+    )
+    // Creating a button that on
+    // click displays/shows the DatePickerDialog
+    OutlinedButton(onClick = { mDatePickerDialog.show() }, Modifier.fillMaxWidth()) {
+        Text(text = dateFormatter.format(date.value))
+    }
+}
+
+fun search(viewModel: CNRViewModel, focusManager: FocusManager, from: String, to: String) {
     focusManager.clearFocus()
     val encodedString =
         URLEncoder.encode(viewModel.searchBoxText, "utf-8")
     CoroutineScope(Dispatchers.IO).launch {
         val result =
-            RetrofitHelper.getNewsFromTopicCall(encodedString, viewModel.sortBy)
+            RetrofitHelper.getNewsFromTopicCall(encodedString, viewModel.sortBy, from, to)
         if (result != null) {
             viewModel.newsList = result
         }
