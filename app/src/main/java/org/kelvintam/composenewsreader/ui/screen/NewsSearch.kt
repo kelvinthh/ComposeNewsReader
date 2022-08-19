@@ -57,9 +57,10 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
     val focusManager = LocalFocusManager.current
 
     val today = Date()
-    val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
-    val fromDate = remember { mutableStateOf(today) }
+    val yesterday = Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000L);
+    val fromDate = remember { mutableStateOf(yesterday) }
     val toDate = remember { mutableStateOf(today) }
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd")
 
 
     ModalBottomSheetLayout(
@@ -174,7 +175,7 @@ fun NewsSearch(navigator: DestinationsNavigator, viewModel: CNRViewModel) {
                         )
                     }
                 }
-                items(items = viewModel.newsList, key = { it.url }) { article ->
+                items(viewModel.newsList) { article ->
                     NewsCard(navigator, article) { viewModel.writeRecentReadListToPref(it) }
                 }
             }
