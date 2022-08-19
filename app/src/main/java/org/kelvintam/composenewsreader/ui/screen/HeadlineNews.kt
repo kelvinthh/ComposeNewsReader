@@ -56,10 +56,14 @@ fun HeadlineNews(
                 }
                 return@LazyColumn
             }
-            item{
-                Text("Welcome!", style = TextStyle.welcome, modifier = Modifier.padding(horizontal = 15.dp))
+            item {
+                Text(
+                    "Welcome!",
+                    style = TextStyle.welcome,
+                    modifier = Modifier.padding(horizontal = 15.dp)
+                )
             }
-            items(items = viewModel.headlineList, key = { it.url }) { article ->
+            items(viewModel.headlineList) { article ->
                 NewsCard(navigator, article) { viewModel.writeRecentReadListToPref(it) }
             }
         }
